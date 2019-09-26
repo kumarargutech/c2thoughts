@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -12,7 +12,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import logoImg from '../assets/images/header/logo.jpg';
 import centerImg from '../assets/images/header/center-img.jpg';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Slide from '@material-ui/core/Slide';
+import { useTheme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
+import ModalDisplay from '../Layout/ModalDisplay';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -47,8 +55,24 @@ const useStyles = makeStyles(theme => ({
 
 export default function Header(props) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+  const theme = useTheme();
+  const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const anchorRef = React.useRef(null);
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const [userName, setUserName] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      `https://api.github.com/users/octocat`,
+      {
+        method: "GET"
+      }
+    ).then(res => res.json())
+     .then(response => {
+      setUserName(response.name);
+     }).catch(error => console.log(error));
+  }, [userName]);
 
   const handleToggle = () => {
     setOpen(prevOpen => !prevOpen);
@@ -59,6 +83,15 @@ export default function Header(props) {
       return;
     }
     setOpen(false);
+  };
+
+  const handleClickOpen = () => {
+    setModalOpen(true);
+    setOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -76,8 +109,8 @@ export default function Header(props) {
               <AccountCircle />
             </IconButton>
             <div>
-        <Button ref={anchorRef} aria-controls="menu-list-grow" aria-haspopup="true" onClick={handleToggle} className={classes.userName}>
-          Surya
+        <Button ref={anchorRef} aria-controls="profile-menu-list" aria-haspopup="true" onClick={handleToggle} className={classes.userName}>
+          {userName}
         </Button>
         <Popper open={open} anchorEl={anchorRef.current} keepMounted transition>
           {({ TransitionProps, placement }) => (
@@ -85,21 +118,25 @@ export default function Header(props) {
               {...TransitionProps}
               style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
             >
-              <Paper id="menu-list-grow">
+              <Paper id="profile-menu-list">
                 <ClickAwayListener onClickAway={handleClose}>
                   <MenuList>
-                    <MenuItem onClick={handleClose}>Search</MenuItem>
-                    <MenuItem onClick={handleClose}>Settings</MenuItem>
-                    <MenuItem onClick={handleClose}>What's New</MenuItem>
-                    <MenuItem onClick={handleClose}>My Activity</MenuItem>
-                    <MenuItem onClick={handleClose}>Care Gap Reports</MenuItem>
-                    <MenuItem onClick={handleClose}>Logout</MenuItem>
+                    <MenuItem onClick={handleClose}>{"Search"}</MenuItem>
+                    <MenuItem onClick={handleClose}>{"Settings"}</MenuItem>
+                    <MenuItem onClick={handleClose}>{"What's New"}</MenuItem>
+                    <MenuItem onClick={handleClose}>{"My Activity"}</MenuItem>
+                    <MenuItem onClick={handleClose}>{"Care Gap Reports"}</MenuItem>
+                    <MenuItem onClick={handleClickOpen}>{"Logout"}</MenuItem>
                   </MenuList>
                 </ClickAwayListener>
               </Paper>
             </Grow>
           )}
         </Popper>
+        {modalOpen ? <ModalDisplay fullScreen={fullScreen}
+                      modalOpen={modalOpen}
+                      Transition={Transition}
+                      handleModalClose={handleModalClose} /> : ''}
       </div>
     </div>
   </Toolbar>
