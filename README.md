@@ -1,1 +1,2 @@
-# customer-connect
+# Customer Connect Project
+
