@@ -11,12 +11,12 @@ import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import logoImg from '../assets/images/header/logo.jpg';
-import centerImg from '../assets/images/header/center-img.jpg';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Slide from '@material-ui/core/Slide';
 import { useTheme } from '@material-ui/core/styles';
 import { makeStyles } from '@material-ui/core/styles';
 import ModalDisplay from '../Layout/ModalDisplay';
+import { Typography } from "@material-ui/core";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -35,10 +35,23 @@ const useStyles = makeStyles(theme => ({
     title: {
       flexGrow: 1
     },
+    logoImg: {
+      height: 40
+    },
+    serviceConnect: {
+      flexGrow: 1,
+      backgroundColor: '#00D6CA',
+      fontSize: 20,
+      padding: 21,
+      marginTop:10,
+      textTransform: 'uppercase',
+      paddingLeft: 250,
+      paddingRight: 250
+    },
     userName: {
         color: 'black',
         textAlign: 'center',
-        padding: '12px'
+        padding: 12
     },
     sectionDesktop: {
         display: 'none',
@@ -49,7 +62,10 @@ const useStyles = makeStyles(theme => ({
     },
     sectionLogo: {
         borderRight: '1px solid #dcdcdc',
-        paddingRight: '12px'
+        paddingRight: 12
+    },
+    textDecoration: {
+      textDecoration: 'none'
     }
   }));
 
@@ -63,20 +79,16 @@ export default function Header(props) {
   const [userName, setUserName] = useState([]);
 
   useEffect(() => {
-    fetch(
-      `https://api.github.com/users/octocat`,
-      {
-        method: "GET"
-      }
-    ).then(res => res.json())
-     .then(response => {
-      setUserName(response.name);
-     }).catch(error => console.log(error));
+    setUserName("Surya");
   }, [userName]);
 
   const handleToggle = () => {
     setOpen(prevOpen => !prevOpen);
   };
+
+  const handleToggleOut = () => {
+    setOpen(!open);
+  }
 
   const handleClose = event => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
@@ -92,55 +104,61 @@ export default function Header(props) {
 
   const handleModalClose = () => {
     setModalOpen(false);
+    setOpen(false);
   };
 
   return (
+    <>
     <div className={classes.root}>
       <AppBar position="static" className={classes.bkGroundColor}>
         <Toolbar>
             <div className={classes.sectionLogo}>
-              <img src={logoImg} alt="logo" />
+              <img src={logoImg} className={classes.logoImg} alt="logo" />
             </div>
             <div className={classes.title}>
-                <img src={centerImg} alt="center-image" />
+              <Typography><span className={classes.serviceConnect}><b>{"Service Connect"}</b></span></Typography>
             </div>
             <div className={classes.sectionDesktop}>
             <IconButton edge="end" aria-label="current user" aria-haspopup="true" color="black">
               <AccountCircle />
             </IconButton>
             <div>
-        <Button ref={anchorRef} aria-controls="profile-menu-list" aria-haspopup="true" onClick={handleToggle} className={classes.userName}>
-          {userName}
-        </Button>
-        <Popper open={open} anchorEl={anchorRef.current} keepMounted transition>
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-            >
-              <Paper id="profile-menu-list">
-                <ClickAwayListener onClickAway={handleClose}>
-                  <MenuList>
-                    <MenuItem onClick={handleClose}>{"Search"}</MenuItem>
-                    <MenuItem onClick={handleClose}>{"Settings"}</MenuItem>
-                    <MenuItem onClick={handleClose}>{"What's New"}</MenuItem>
-                    <MenuItem onClick={handleClose}>{"My Activity"}</MenuItem>
-                    <MenuItem onClick={handleClose}>{"Care Gap Reports"}</MenuItem>
-                    <MenuItem onClick={handleClickOpen}>{"Logout"}</MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
-        {modalOpen ? <ModalDisplay fullScreen={fullScreen}
-                      modalOpen={modalOpen}
-                      Transition={Transition}
-                      handleModalClose={handleModalClose} /> : ''}
-      </div>
+            <Button ref={anchorRef} aria-controls="profile-menu-list" aria-haspopup="true" onMouseEnter={handleToggle}
+              onMouseLeave={handleToggleOut} className={classes.userName}>
+              {userName}
+            </Button>
+            <Popper open={open} anchorEl={anchorRef.current} keepMounted transition>
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                >
+                  <Paper id="profile-menu-list" onMouseEnter={handleToggle} onMouseLeave={handleToggleOut}>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList>
+                        <MenuItem>{"Search"}</MenuItem>
+                        <MenuItem>{"Settings"}</MenuItem>
+                        <MenuItem>{"What's New"}</MenuItem>
+                        <MenuItem>{"My Activity"}</MenuItem>
+                        <MenuItem>{"Care Gap Reports"}</MenuItem>
+                        <MenuItem onClick={handleClickOpen}>{"Logout"}</MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+            {modalOpen ? <ModalDisplay fullScreen={fullScreen}
+                          modalOpen={modalOpen}
+                          Transition={Transition}
+                          handleModalClose={handleModalClose}
+                          textDecoration={classes.textDecoration}
+                          /> : ''}
+            </div>
+          </div>
+        </Toolbar>
+      </AppBar>
     </div>
-  </Toolbar>
-</AppBar>
-</div>
+  </>
 );
 }
