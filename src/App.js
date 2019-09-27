@@ -1,11 +1,18 @@
 import React from 'react';
-import Layout from './Layout/Layout';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Layout from './Header/Header';
+import Logout from './Header/Logout';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <Layout />
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Layout} />
+          <Route path="/logout" component={Logout} />
+        </Switch>
+      </Router>
     </div>
   );
 }
