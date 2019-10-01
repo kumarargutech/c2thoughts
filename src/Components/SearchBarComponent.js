@@ -167,7 +167,7 @@ export default function SearchBarComponent() {
           {...autosuggestProps}
           inputProps={{
             classes,
-            id: 'react-autosuggest-simple',
+            id: 'auto-searchbar',
             label: 'Search by First/Last Name, Last/First Name, Last name w/DOB, HCCID, SSN#, HIC or MBI',
             value: state.single,
             onChange: handleChange('single'),
